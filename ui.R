@@ -161,8 +161,9 @@ ui <- navbarPage(
               tabPanel(
                 "VORONOI TREEMAP",
                 uiOutput("voronoi.ui"),
-                help_voronoi()
-                #downloadButton("UserDownloadDotplot", "Download svg"),
+                help_voronoi(),
+                downloadButton("UserDownloadSvg", "SVG"),
+                downloadButton("UserDownloadPng", "PNG"),
               )
             )
           )
@@ -182,7 +183,7 @@ ui <- navbarPage(
   # THE ABOUT PAGE
   tabPanel("About", 
     # THE SAME OR A BIT EXTENDED HELP BOX AS IN SIDEBAR
-    column(width = 4,
+    column(width = 6,
       helpbox(width = 12)
     )
   )

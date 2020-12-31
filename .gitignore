@@ -4,3 +4,4 @@ rsconnect/*
 .RData
 .Ruserdata
 ShinyTreemaps.Rproj
+.Rproj.user

@@ -48,21 +48,33 @@ server <- function(input, output) {
       selected = "none")
   })
   
-  # generic download handler for all download buttons
-  getDownload <- function(filename, plot) {
-    downloadHandler(
-      filename = filename,
-      content = function(file) {
-        svg(file, 
-          width = {if (input$UserPrintWidth == "auto") 7
-            else as.numeric(input$UserPrintWidth)/100}, 
-          height = as.numeric(input$UserPrintHeight)/100)
-        print(plot)
-        dev.off()
-      },
-      contentType = "image/svg"
-    )
-  }
+  # SVG download handler
+  output$UserDownloadSvg <- downloadHandler(
+    filename = "treemap.svg",
+    content = function(file) {
+      svg(file, 
+        width = {if (input$UserPrintWidth == "auto") 7
+          else as.numeric(input$UserPrintWidth)/100}, 
+        height = as.numeric(input$UserPrintHeight)/100)
+      plot_treemap(input = input)
+      dev.off()
+    },
+    contentType = "image/svg"
+  )
+  
+  # PNG download handler
+  output$UserDownloadPng <- downloadHandler(
+    filename = "treemap.png",
+    content = function(file) {
+      png(file, res = 180,
+        width = {if (input$UserPrintWidth == "auto") 1400
+          else 2*as.numeric(input$UserPrintWidth)}, 
+        height = 2*as.numeric(input$UserPrintHeight))
+      plot_treemap(input = input)
+      dev.off()
+    },
+    contentType = "image/png"
+  )
   
   # DYANMIC CONTROLS
   # ***********************************************
@@ -156,36 +168,41 @@ server <- function(input, output) {
         error_tol = input$UserErrorTol,
         seed = seed_input,
         positioning = input$UserPositioning
-      )
+      ),
+      message = "computing treemap"
     )
   })
   
   # plotting of treemap
+  plot_treemap <- function(input) {
+    # coerce border level input to numeric
+    if (input$UserBorderLevel == "all") {
+      border_level <- seq_along(input$UserDataVars)
+    } else {
+      border_level <- as.numeric(input$UserBorderLevel)
+    }
+    
+    # draw treemap
+    drawTreemap(tm(),
+      color_type = input$UserColorType,
+      color_level = as.numeric(input$UserColorLevel),
+      color_palette = palettes[[input$UserColorPalette]],
+      border_level = border_level,
+      border_size = input$UserBorderSize,
+      border_color = input$UserBorderColor,
+      label_level = as.numeric(input$UserLabelLevel),
+      label_size = input$UserLabelSize,
+      label_color = input$UserLabelColor,
+      legend = input$UserLegend,
+    )
+  }
+  
+  # rendering of treemap
   output$voronoi <- renderPlot({
     if (input$UserCreate == 0) {
       grid::grid.text("Placeholder... waiting for input")
     } else {
-      
-      # coerce border level inout to numeric
-      if (input$UserBorderLevel == "all") {
-        border_level <- seq_along(input$UserDataVars)
-      } else {
-        border_level <- as.numeric(input$UserBorderLevel)
-      }
-      
-      # draw treemap
-      drawTreemap(tm(),
-        color_type = input$UserColorType,
-        color_level = as.numeric(input$UserColorLevel),
-        color_palette = palettes[[input$UserColorPalette]],
-        border_level = border_level,
-        border_size = input$UserBorderSize,
-        border_color = input$UserBorderColor,
-        label_level = as.numeric(input$UserLabelLevel),
-        label_size = input$UserLabelSize,
-        label_color = input$UserLabelColor,
-        legend = input$UserLegend,
-      )
+      plot_treemap(input = input)
     }
   })
 
