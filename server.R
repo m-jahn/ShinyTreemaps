@@ -9,8 +9,8 @@ server <- function(input, output) {
   
   # variable that holds the input data frames
   datalist <- reactiveValues(
-    starwars = starwars,
-    mtcars = mtcars
+    mtcars = mtcars,
+    starwars = starwars
   )
   
   # function that adds new data from input button
@@ -25,10 +25,10 @@ server <- function(input, output) {
   output$DataChoice <- renderUI({
     selectInput("UserDataChoice",
       "Choose data:", names(datalist),
-      selected = tail(names(datalist),1))
+      selected = names(datalist)[1])
   })
   
-  # assignment of one chosen data frame as main df, for simplicity
+  # assignment of the chosen data frame to main data slot
   data <- reactive({
     datalist[[input$UserDataChoice]]
   })
@@ -37,7 +37,7 @@ server <- function(input, output) {
     req(input$UserDataChoice)
     selectInput("UserDataVars",
       "Variables:", colnames(data()),
-      selected = NULL, 
+      selected = colnames(data())[1], 
       multiple = TRUE)
   })
   
@@ -177,7 +177,7 @@ server <- function(input, output) {
   plot_treemap <- function(input) {
     # coerce border level input to numeric
     if (input$UserBorderLevel == "all") {
-      border_level <- seq_along(input$UserDataVars)
+      border_level <- seq_along(tm()@call$levels)
     } else {
       border_level <- as.numeric(input$UserBorderLevel)
     }
@@ -190,20 +190,44 @@ server <- function(input, output) {
       border_level = border_level,
       border_size = input$UserBorderSize,
       border_color = input$UserBorderColor,
-      label_level = as.numeric(input$UserLabelLevel),
+      label_level = as.numeric(isolate(input$UserLabelLevel)),
       label_size = input$UserLabelSize,
       label_color = input$UserLabelColor,
       legend = input$UserLegend,
     )
   }
   
+  # treemap file list
+  plot_list <- reactiveValues()
+  
   # rendering of treemap
   output$voronoi <- renderPlot({
     if (input$UserCreate == 0) {
-      grid::grid.text("Placeholder... waiting for input")
+      drawTreemap(example)
+      grid::grid.text("EXAMPLE", gp = grid::gpar(cex = 7, col = "white", alpha = 0.7))
     } else {
       plot_treemap(input = input)
+      # also write to disk
+      filename = paste0("www/treemap_", formatC(input$UserCreate, 
+        digits = 2, flag = "0"), ".png")
+      png(filename = filename, res = 180,
+        width = {if (input$UserPrintWidth == "auto") 1400
+          else 2*as.numeric(input$UserPrintWidth)}, 
+        height = 2*as.numeric(input$UserPrintHeight))
+      plot_treemap(input = input)
+      dev.off()
+      # add file name to reactive list
+      plot_list[[paste0("plot_", length(plot_list)+1)]] <- filename
     }
+  })
+  
+  # GALLERY WIDGET
+  # rendering of gallery
+  output$gallery <- renderSlickR({
+    reactiveValuesToList(plot_list)
+    imgs <- list.files("www", full.names = TRUE)
+    slickR(imgs, objLinks = NULL, slideType = "img", height = "300px") + 
+      settings(slidesPerRow = 1, rows = 5, vertical = TRUE)
   })
 
 }

@@ -173,7 +173,7 @@ ui <- navbarPage(
         column(width = 4,
           wellPanel(
             h4("GALLERY"),
-            p('Added soon')
+            slickROutput("gallery", height = "30%")
           )
         )
       )
