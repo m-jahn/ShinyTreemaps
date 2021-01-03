@@ -173,9 +173,10 @@ server <- function(input, output) {
     )
     
     # add file name for new treemap to reactive list
-    plotname <- paste0("plot_", isolate(input$UserCreate))
-    filename <- paste0("www/treemap_", formatC(isolate(input$UserCreate), 
-      digits = 2, flag = "0"), ".png")
+    plot_counter$count <- plot_counter$count + 1
+    plotname <- paste0("plot_", plot_counter$count)
+    filename <- paste0("www/treemap_",
+      formatC(plot_counter$count, digits = 2, flag = "0"), ".png")
     plot_list[[plotname]] <- filename
     
     # return treemap
@@ -216,10 +217,15 @@ server <- function(input, output) {
       # plot treemap
       plot_treemap(input = input)
       
+      if (plot_counter$count > 0) {
+        fn <- plot_list[[paste0("plot_", plot_counter$count)]]
+      } else {
+        fn <- "www/treemap_000.png"
+      }
+      
       # also save treemap to disk
       png(
-        filename = plot_list[[paste0("plot_", isolate(input$UserCreate))]], 
-        res = 180,
+        filename = fn, res = 180,
         width = {if (input$UserPrintWidth == "auto") 1400
           else 2*as.numeric(input$UserPrintWidth)}, 
         height = 2*as.numeric(input$UserPrintHeight))
@@ -232,6 +238,7 @@ server <- function(input, output) {
   # GALLERY WIDGET
   # ***********************************************
   # keep track of treemaps with a reactive list
+  plot_counter <- reactiveValues(count = 0)
   plot_list <- reactiveValues()
   
   # rendering of gallery
@@ -242,17 +249,18 @@ server <- function(input, output) {
       input$UserLegend, input$UserColorType, input$UserColorPalette,
       input$UserLabelColor, input$UserBorderColor, input$UserLabelSize,
       input$UserBorderSize)
-    imgs <- list.files("www", full.names = TRUE)
+    imgs <- list.files("www", pattern = "[0-9].png", full.names = TRUE)
     slickR(imgs, objLinks = NULL, slideType = "img", height = "300px") + 
       settings(slidesPerRow = 1, rows = 3, vertical = TRUE)
   })
   
   # function to clean plots from gallery and locally
   observeEvent(input$UserClean, {
-    file.remove(list.files("www", full.names = TRUE))
+    file.remove(list.files("www", pattern = "[0-9].png", full.names = TRUE))
     for (n in names(reactiveValuesToList(plot_list))) {
       plot_list[[n]] <- NULL
     }
+    plot_counter$count <- 0
   })
   
 }
