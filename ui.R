@@ -145,8 +145,11 @@ ui <- navbarPage(
         ),
         
         fluidRow(
-          column(width = 6,
+          column(width = 3,
             actionButton("UserCreate", "Make Treemap!", class = "btn-success")
+          ),
+          column(width = 3,
+            actionButton("UserClean", "Clear gallery", class = "btn-success")
           )
         )
       ),

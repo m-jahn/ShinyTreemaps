@@ -76,7 +76,7 @@ server <- function(input, output) {
     contentType = "image/png"
   )
   
-  # DYANMIC CONTROLS
+  # DYNAMIC CONTROLS
   # ***********************************************
   #
   # display status for selected variables
@@ -157,7 +157,7 @@ server <- function(input, output) {
     }
     
     # generate treemap
-    withProgress(
+    tm <- withProgress(
       voronoiTreemap(
         data = na.omit(df),
         levels = input$UserDataVars,
@@ -171,6 +171,15 @@ server <- function(input, output) {
       ),
       message = "computing treemap"
     )
+    
+    # add file name for new treemap to reactive list
+    plotname <- paste0("plot_", isolate(input$UserCreate))
+    filename <- paste0("www/treemap_", formatC(isolate(input$UserCreate), 
+      digits = 2, flag = "0"), ".png")
+    plot_list[[plotname]] <- filename
+    
+    # return treemap
+    tm
   })
   
   # plotting of treemap
@@ -197,37 +206,53 @@ server <- function(input, output) {
     )
   }
   
-  # treemap file list
-  plot_list <- reactiveValues()
-  
   # rendering of treemap
   output$voronoi <- renderPlot({
     if (input$UserCreate == 0) {
       drawTreemap(example)
       grid::grid.text("EXAMPLE", gp = grid::gpar(cex = 7, col = "white", alpha = 0.7))
     } else {
+      
+      # plot treemap
       plot_treemap(input = input)
-      # also write to disk
-      filename = paste0("www/treemap_", formatC(input$UserCreate, 
-        digits = 2, flag = "0"), ".png")
-      png(filename = filename, res = 180,
+      
+      # also save treemap to disk
+      png(
+        filename = plot_list[[paste0("plot_", isolate(input$UserCreate))]], 
+        res = 180,
         width = {if (input$UserPrintWidth == "auto") 1400
           else 2*as.numeric(input$UserPrintWidth)}, 
         height = 2*as.numeric(input$UserPrintHeight))
       plot_treemap(input = input)
       dev.off()
-      # add file name to reactive list
-      plot_list[[paste0("plot_", length(plot_list)+1)]] <- filename
     }
   })
   
+  
   # GALLERY WIDGET
+  # ***********************************************
+  # keep track of treemaps with a reactive list
+  plot_list <- reactiveValues()
+  
   # rendering of gallery
   output$gallery <- renderSlickR({
-    reactiveValuesToList(plot_list)
+    # reload widget whenever graphical options change but not otherwise
+    req(reactiveValuesToList(plot_list), 
+      input$UserPrintWidth, input$UserPrintHeight,
+      input$UserLegend, input$UserColorType, input$UserColorPalette,
+      input$UserLabelColor, input$UserBorderColor, input$UserLabelSize,
+      input$UserBorderSize)
     imgs <- list.files("www", full.names = TRUE)
     slickR(imgs, objLinks = NULL, slideType = "img", height = "300px") + 
-      settings(slidesPerRow = 1, rows = 5, vertical = TRUE)
+      settings(slidesPerRow = 1, rows = 3, vertical = TRUE)
   })
-
+  
+  # function to clean plots from gallery and locally
+  observeEvent(input$UserClean, {
+    file.remove(list.files("www", full.names = TRUE))
+    for (n in names(reactiveValuesToList(plot_list))) {
+      plot_list[[n]] <- NULL
+    }
+  })
+  
 }
