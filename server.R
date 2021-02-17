@@ -56,7 +56,7 @@ server <- function(input, output) {
         width = {if (input$UserPrintWidth == "auto") 7
           else as.numeric(input$UserPrintWidth)/100}, 
         height = as.numeric(input$UserPrintHeight)/100)
-      plot_treemap(input = input)
+      plot_treemap(tm = tm(), input = input)
       dev.off()
     },
     contentType = "image/svg"
@@ -70,7 +70,7 @@ server <- function(input, output) {
         width = {if (input$UserPrintWidth == "auto") 1400
           else 2*as.numeric(input$UserPrintWidth)}, 
         height = 2*as.numeric(input$UserPrintHeight))
-      plot_treemap(input = input)
+      plot_treemap(tm = tm(), input = input)
       dev.off()
     },
     contentType = "image/png"
@@ -184,23 +184,23 @@ server <- function(input, output) {
   })
   
   # plotting of treemap
-  plot_treemap <- function(input) {
+  plot_treemap <- function(tm, input) {
     # coerce border level input to numeric
     if (input$UserBorderLevel == "all") {
-      border_level <- seq_along(tm()@call$levels)
+      border_level <- seq_along(tm@call$levels)
     } else {
       border_level <- as.numeric(input$UserBorderLevel)
     }
     
     # draw treemap
-    drawTreemap(tm(),
+    drawTreemap(tm,
       color_type = input$UserColorType,
       color_level = as.numeric(input$UserColorLevel),
       color_palette = palettes[[input$UserColorPalette]],
       border_level = border_level,
       border_size = input$UserBorderSize,
       border_color = input$UserBorderColor,
-      label_level = as.numeric(isolate(input$UserLabelLevel)),
+      label_level = as.numeric(input$UserLabelLevel),
       label_size = input$UserLabelSize,
       label_color = input$UserLabelColor,
       legend = input$UserLegend,
@@ -209,28 +209,26 @@ server <- function(input, output) {
   
   # rendering of treemap
   output$voronoi <- renderPlot({
-    if (input$UserCreate == 0) {
-      drawTreemap(example)
-      grid::grid.text("EXAMPLE", gp = grid::gpar(cex = 7, col = "white", alpha = 0.7))
+    
+    # draw placeholder for initial start up
+    if (is.null(input$UserBorderLevel) | input$UserCreate == 0) {
+      drawTreemap(example, color_palette = "white", label_size = 3, label_color = grey(0.8))
+      grid::grid.text("EXAMPLE", gp = grid::gpar(cex = 7, col = grey(0.6), alpha = 0.6))
+    
     } else {
-      
       # plot treemap
-      plot_treemap(input = input)
-      
-      if (plot_counter$count > 0) {
-        fn <- plot_list[[paste0("plot_", plot_counter$count)]]
-      } else {
-        fn <- "www/treemap_000.png"
-      }
+      plot_treemap(tm(), input = input)
       
       # also save treemap to disk
-      png(
-        filename = fn, res = 180,
+      fn <- plot_list[[paste0("plot_", plot_counter$count)]]
+      if (!is.null(fn)) {
+      png(filename = fn, res = 180,
         width = {if (input$UserPrintWidth == "auto") 1400
           else 2*as.numeric(input$UserPrintWidth)}, 
         height = 2*as.numeric(input$UserPrintHeight))
-      plot_treemap(input = input)
+      plot_treemap(tm(), input = input)
       dev.off()
+      }
     }
   })
   
@@ -248,7 +246,7 @@ server <- function(input, output) {
       input$UserPrintWidth, input$UserPrintHeight,
       input$UserLegend, input$UserColorType, input$UserColorPalette,
       input$UserLabelColor, input$UserBorderColor, input$UserLabelSize,
-      input$UserBorderSize)
+      input$UserBorderSize, input$UserLabelLevel, input$UserBorderLevel)
     imgs <- list.files("www", pattern = "[0-9].png", full.names = TRUE)
     slickR(imgs, objLinks = NULL, slideType = "img", height = "300px") + 
       settings(slidesPerRow = 1, rows = 3, vertical = TRUE)

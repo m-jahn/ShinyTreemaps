@@ -106,7 +106,7 @@ ui <- navbarPage(
         ),
         
         fluidRow(
-          column(width = 3, 
+          column(width = 3,
             selectInput("UserColorPalette",
               "Palette", choices = c("rainbow", "hawaii", "sunset", "batlow", 
               "terrain", "dark_mint", "viridis", "plasma", "purple_yellow", 
@@ -149,7 +149,7 @@ ui <- navbarPage(
             actionButton("UserCreate", "Make Treemap!", class = "btn-success")
           ),
           column(width = 3,
-            actionButton("UserClean", "Clear gallery", class = "btn-success")
+            actionButton("UserClean", "Clear gallery", class = "btn-primary")
           )
         )
       ),
@@ -186,7 +186,7 @@ ui <- navbarPage(
   # THE ABOUT PAGE
   tabPanel("About", 
     # THE SAME OR A BIT EXTENDED HELP BOX AS IN SIDEBAR
-    column(width = 6,
+    column(width = 12,
       helpbox(width = 12)
     )
   )
