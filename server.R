@@ -95,22 +95,22 @@ server <- function(input, output) {
   output$ColorLevel <- renderUI({
     req(input$UserDataVars)
     selectInput("UserColorLevel",
-      "Color level", 1:(length(input$UserDataVars)),
+      "Color level", seq_along(input$UserDataVars),
       selected = 1)
-  })
-  
-  output$BorderLevel <- renderUI({
-    req(input$UserDataVars)
-    selectInput("UserBorderLevel",
-      "Border level", c("all", 1:(length(input$UserDataVars))),
-      selected = "all")
   })
   
   output$LabelLevel <- renderUI({
     req(input$UserDataVars)
     selectInput("UserLabelLevel",
-      "Label level", 1:(length(input$UserDataVars)),
-      selected = length(input$UserDataVars))
+      "Label level", seq_along(input$UserDataVars),
+      selected = 1)
+  })
+    
+  output$BorderLevel <- renderUI({
+    req(input$UserDataVars)
+    selectInput("UserBorderLevel",
+      "Border level", c("all", seq_along(input$UserDataVars)),
+      selected = "all")
   })
   
   palettes <- reactiveValues(
@@ -246,7 +246,9 @@ server <- function(input, output) {
       input$UserPrintWidth, input$UserPrintHeight,
       input$UserLegend, input$UserColorType, input$UserColorPalette,
       input$UserLabelColor, input$UserBorderColor, input$UserLabelSize,
-      input$UserBorderSize, input$UserLabelLevel, input$UserBorderLevel)
+      input$UserBorderSize, input$UserColorLevel, input$UserLabelLevel,
+      input$UserBorderLevel)
+    # display saved images
     imgs <- list.files("www", pattern = "[0-9].png", full.names = TRUE)
     slickR(imgs, objLinks = NULL, slideType = "img", height = "300px") + 
       settings(slidesPerRow = 1, rows = 3, vertical = TRUE)
