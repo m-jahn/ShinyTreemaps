@@ -101,7 +101,7 @@ ui <- navbarPage(
           ),
           column(width = 3, 
             selectInput("UserColorType",
-              "Coloring", choices = c("categorical", "cell_size"), selected = "categorical")
+              "Coloring", choices = c("categorical", "cell_size", "both"), selected = "categorical")
           )
         ),
         
