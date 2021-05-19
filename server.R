@@ -212,8 +212,15 @@ server <- function(input, output) {
     
     # draw placeholder for initial start up
     if (is.null(input$UserBorderLevel) | input$UserCreate == 0) {
-      drawTreemap(example, color_palette = "white", label_size = 3, label_color = grey(0.8))
-      grid::grid.text("EXAMPLE", gp = grid::gpar(cex = 7, col = grey(0.6), alpha = 0.6))
+      drawTreemap(
+        example,
+        color_palette = rainbow_hcl(n = 7, start = 60),
+        color_type = "both",
+        border_color = grey(0.1),
+        border_size = 7,
+        label_color = grey(0.1),
+        label_size = 4)
+      grid::grid.text("EXAMPLE", gp = grid::gpar(cex = 7, col = "white"))
     
     } else {
       # plot treemap
