@@ -10,7 +10,8 @@ server <- function(input, output) {
   # variable that holds the input data frames
   datalist <- reactiveValues(
     mtcars = mtcars,
-    starwars = starwars
+    starwars = starwars,
+    airquality = airquality
   )
   
   # function that adds new data from input button
