@@ -66,7 +66,7 @@ server <- function(input, output) {
   output$UserDownloadPng <- downloadHandler(
     filename = "treemap.png",
     content = function(file) {
-      png(file, res = 180,
+      png(file, res = 140,
         width = {if (input$UserPrintWidth == "auto") 1400
           else 2*as.numeric(input$UserPrintWidth)}, 
         height = 2*as.numeric(input$UserPrintHeight))
@@ -229,7 +229,7 @@ server <- function(input, output) {
       # also save treemap to disk
       fn <- plot_list[[paste0("plot_", plot_counter$count)]]
       if (!is.null(fn)) {
-      png(filename = fn, res = 180,
+      png(filename = fn, res = 140,
         width = {if (input$UserPrintWidth == "auto") 1400
           else 2*as.numeric(input$UserPrintWidth)}, 
         height = 2*as.numeric(input$UserPrintHeight))
