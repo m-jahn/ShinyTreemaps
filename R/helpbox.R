@@ -18,7 +18,7 @@ helpbox <- function(width = 12) {
           For the default, cell_size = NULL, cell area is simply computed by the number of members 
           for the respective cell (corresponding to rows in input data table)'),
         tags$li('shape: Set the initial shape of the treemap. Currently supported are the 
-          keywords "rectangle", "rounded_rect", "circle" or "hexagon". In the SysbioTreemaps R package,
+          keywords "rectangle", "rounded_rect", "circle" or "hexagon". In the WeightedTreemaps R package,
           the user can also supply a named list with coordinates for a custom polygon.'),
         tags$li('maxIteration: Force algorithm to stop at this number of iterations 
           for each parent cell. The algorithm usually converges to an acceptable
@@ -84,9 +84,9 @@ helpbox <- function(width = 12) {
       
       h4('CONTACT'),
       p('For questions or reporting issues, contact 
-        Michael Jahn, Science For Life Lab - Royal Technical University (KTH), Stockholm'), 
+        Michael Jahn, Max Planck Unit for the Science of Pathogens (MPUSP), Berlin, Germany'), 
       p(
-        a(href ='mailto:michael.jahn@scilifelab.se', target = '_blank', 'email: Michael Jahn')
+        a(href ='mailto:jahn@mpusp.mpg.de', target = '_blank', 'email: Michael Jahn')
       )
     )
   )

@@ -18,14 +18,14 @@ If you want to *run ShinyTreemaps locally*, you need to have R (optionally also 
 - `shinyWidgets`
 - `dplyr`
 - `colorspace`
-- `SysbioTreemaps`
+- `WeightedTreemaps`
 
 Open `server.R` or `ui.R` in RStudio and push the `Run App` button in Rstudio, done!
 You can also run the app from R console, just call `runApp("path-to-ShinyTreemaps)`.
 
-### An app for R package `SysbioTreemaps`
+### An app for R package `WeightedTreemaps`
 
-ShinyTreemaps is simply a GUI wrapper for [SysbioTreemaps](https://github.com/m-jahn/SysbioTreemaps). Treemaps are a visually appealing graphical representation of numerical data using a space-filling approach. A plane or ‘map’ is subdivided into smaller areas called cells. The cells in the map are scaled according to an underlying metric which allows to grasp the hierarchical organization and relative importance of many objects at once. This package contains two different implementations of treemaps, **Voronoi treemaps**, **Sunburst treemaps**.
+ShinyTreemaps is simply a GUI wrapper for [WeightedTreemaps](https://github.com/m-jahn/WeightedTreemaps). Treemaps are a visually appealing graphical representation of numerical data using a space-filling approach. A plane or ‘map’ is subdivided into smaller areas called cells. The cells in the map are scaled according to an underlying metric which allows to grasp the hierarchical organization and relative importance of many objects at once. This package contains two different implementations of treemaps, **Voronoi treemaps** and **Sunburst treemaps**.
 
 Features:
 
