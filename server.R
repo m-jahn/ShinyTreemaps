@@ -173,13 +173,6 @@ server <- function(input, output) {
       message = "computing treemap"
     )
     
-    # add file name for new treemap to reactive list
-    plot_counter$count <- plot_counter$count + 1
-    plotname <- paste0("plot_", plot_counter$count)
-    filename <- paste0("www/treemap_",
-      formatC(plot_counter$count, digits = 2, flag = "0"), ".png")
-    plot_list[[plotname]] <- filename
-    
     # return treemap
     tm
   })
@@ -234,48 +227,45 @@ server <- function(input, output) {
     } else {
       # plot treemap
       plot_treemap(tm(), input = input)
-      
-      # also save treemap to disk
-      fn <- plot_list[[paste0("plot_", plot_counter$count)]]
-      if (!is.null(fn)) {
-      png(filename = fn, res = 140,
-        width = {if (input$UserPrintWidth == "auto") 1400
-          else 2*as.numeric(input$UserPrintWidth)}, 
-        height = 2*as.numeric(input$UserPrintHeight))
-      plot_treemap(tm(), input = input)
-      dev.off()
-      }
     }
   })
-  
   
   # GALLERY WIDGET
   # ***********************************************
   # keep track of treemaps with a reactive list
   plot_counter <- reactiveValues(count = 0)
-  plot_list <- reactiveValues()
+  
+  # reactive saving of treemap to disk and gallery
+  addedToGal <- eventReactive(input$UserAddGallery, {
+    # save treemap to disk
+    filename <- paste0(
+      "www/treemap_",
+      formatC(plot_counter$count, digits = 2, flag = "0"), ".png")
+    png(
+      filename = filename, res = 140,
+      width = {if (input$UserPrintWidth == "auto") 1400
+        else 2*as.numeric(input$UserPrintWidth)}, 
+      height = 2*as.numeric(input$UserPrintHeight)
+    )
+    plot_treemap(tm(), input = input)
+    dev.off()
+    # bump up counter
+    plot_counter$count <- plot_counter$count + 1
+  })
   
   # rendering of gallery
   output$gallery <- renderSlickR({
-    # reload widget whenever graphical options change but not otherwise
-    req(reactiveValuesToList(plot_list), 
-      input$UserPrintWidth, input$UserPrintHeight,
-      input$UserLegend, input$UserColorType, input$UserColorPalette,
-      input$UserLabelColor, input$UserBorderColor, input$UserLabelSize,
-      input$UserBorderSize, input$UserColorLevel, input$UserLabelLevel,
-      input$UserBorderLevel)
-    # display saved images
-    imgs <- list.files("www", pattern = "[0-9].png", full.names = TRUE)
-    slickR(imgs, objLinks = NULL, slideType = "img", height = "300px") + 
+    # reload widget whenever new plot is added
+    req(addedToGal())
+    # add latest saved image to gallery
+    imgs <- list.files("www", pattern = "[0-9]+.png", full.names = TRUE)
+    slickR(tail(imgs, 1), objLinks = NULL, slideType = "img", height = "230px") + 
       settings(slidesPerRow = 1, rows = 3, vertical = TRUE)
   })
   
-  # function to clean plots from gallery and locally
-  observeEvent(input$UserClean, {
-    file.remove(list.files("www", pattern = "[0-9].png", full.names = TRUE))
-    for (n in names(reactiveValuesToList(plot_list))) {
-      plot_list[[n]] <- NULL
-    }
+  # function to clear plots from gallery and locally - CURRENTLY NOT WORKING
+  clearedGal <- eventReactive(input$UserClearGallery, {
+    file.remove(list.files("www", pattern = "[0-9]+.png", full.names = TRUE))
     plot_counter$count <- 0
   })
   

@@ -89,11 +89,11 @@ ui <- navbarPage(
         fluidRow(
           column(width = 3, 
             selectInput("UserPrintHeight",
-              "Plot height", choices = c(1:10*100), selected = 600)
+              "Plot height", choices = c(1:10*100), selected = 700)
           ),
           column(width = 3, 
             selectInput("UserPrintWidth",
-              "Plot width", choices = c("auto", 1:10*100), selected = 600)
+              "Plot width", choices = c("auto", 1:10*100), selected = 700)
           ),
           column(width = 3, 
             selectInput("UserLegend",
@@ -155,7 +155,10 @@ ui <- navbarPage(
             actionButton("UserCreate", "Make Treemap!", class = "btn-success")
           ),
           column(width = 3,
-            actionButton("UserClean", "Clear gallery", class = "btn-primary")
+            actionButton("UserAddGallery", "Add to gallery", class = "btn-primary")
+          ),
+          column(width = 3,
+            actionButton("UserClearGallery", "Clear gallery", class = "btn-primary")
           )
         )
       ),
@@ -164,7 +167,7 @@ ui <- navbarPage(
       # MAIN PANEL WITH OUTPUT PLOTS
       # Each tab has individual Download buttons
       mainPanel(width = 8,
-        column(width = 8,
+        column(width = 9,
           wellPanel(
             tabsetPanel(
               tabPanel(
@@ -179,7 +182,7 @@ ui <- navbarPage(
         ),
         
         # SIDE PANEL WITH PLOT GALLERY
-        column(width = 4,
+        column(width = 3,
           wellPanel(
             h4("GALLERY"),
             slickROutput("gallery", height = "30%")
