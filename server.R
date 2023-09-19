@@ -159,7 +159,7 @@ server <- function(input, output) {
     
     # generate treemap
     tm <- withProgress(
-      voronoiTreemap(
+      WeightedTreemaps::voronoiTreemap(
         data = na.omit(df),
         levels = input$UserDataVars,
         fun = get(input$UserFun),
@@ -192,9 +192,16 @@ server <- function(input, output) {
     } else {
       border_level <- as.numeric(input$UserBorderLevel)
     }
+    # specify legend
+    if (input$UserLegend == "none") {
+      legend <- FALSE
+    } else {
+      legend = TRUE
+      legend_position = input$UserLegend
+    }
     
     # draw treemap
-    drawTreemap(tm,
+    WeightedTreemaps::drawTreemap(tm,
       color_type = input$UserColorType,
       color_level = as.numeric(input$UserColorLevel),
       color_palette = palettes[[input$UserColorPalette]],
@@ -204,7 +211,8 @@ server <- function(input, output) {
       label_level = as.numeric(input$UserLabelLevel),
       label_size = input$UserLabelSize,
       label_color = input$UserLabelColor,
-      legend = input$UserLegend,
+      legend = legend,
+      legend_position = legend_position
     )
   }
   
@@ -213,7 +221,7 @@ server <- function(input, output) {
     
     # draw placeholder for initial start up
     if (is.null(input$UserBorderLevel) | input$UserCreate == 0) {
-      drawTreemap(
+      WeightedTreemaps::drawTreemap(
         example,
         color_palette = rainbow_hcl(n = 7, start = 60),
         color_type = "both",

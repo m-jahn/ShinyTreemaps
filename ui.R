@@ -97,7 +97,7 @@ ui <- navbarPage(
           ),
           column(width = 3, 
             selectInput("UserLegend",
-              "Legend", choices = c(TRUE, FALSE), selected = TRUE)
+              "Legend", choices = c("right", "bottom", "left", "top", "none"), selected = "none")
           ),
           column(width = 3, 
             selectInput("UserColorType",
@@ -125,13 +125,19 @@ ui <- navbarPage(
         
         fluidRow(
           column(width = 3,
-            colorSelectorInput("UserLabelColor",
-              "Label color", grey(1:10/10), selected = grey(0.9)
+            colorPickr(
+              inputId = "UserLabelColor",
+              label = "Label color",
+              width = "100%",
+              selected = "#E6E6E6"
             )
           ),
           column(width = 3,
-            colorSelectorInput("UserBorderColor",
-              "Border color", grey(1:10/10), selected = grey(0.9)
+            colorPickr(
+              inputId = "UserBorderColor",
+              label = "Border color",
+              width = "100%",
+              selected = "#E6E6E6"
             )
           ),
           column(width = 3,
